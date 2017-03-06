@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 17:00:21 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/05 21:18:26 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/06 22:04:20 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "malloc_structures.h"
 #include "malloc_functions.h"
 #include <unistd.h>
+#include <signal.h>
 
 t_general_struct	g_malloc_infos =
 {
@@ -25,7 +26,7 @@ void	*malloc(size_t size)
 {
 	t_alloc_location	loc;
 
-	ft_putstr("Malloc was called\n");
+//	ft_putstr("Malloc was called\n");
 	if (size == 0)
 		return (NULL);
 	if (g_malloc_infos.page_size == 0)
@@ -45,7 +46,15 @@ void	*malloc(size_t size)
 		ft_putstr("Mmmhh ... final splitting failed\n");
 		return (NULL);
 	}
-	ft_putstr("malloc seems ... ok ???\n");
+/*
+	char				ptr_name[20];
+
+	ft_itoa_base_to_buf((unsigned long long)get_address_of_loc(loc), "0123456789abcdef", ptr_name, 20);
+	ft_putstr("malloc: address : +0x");
+	ft_putendl(ptr_name);
+*/
+
+	//ft_putstr("malloc seems ... ok ???\n");
 	return (get_address_of_loc(loc));
 }
 
@@ -53,32 +62,50 @@ void	free(void *addr)
 {
 	t_alloc_location	loc;
 
-	ft_putstr("Free was called\n");
+//	ft_putstr("Free was called\n");
 	if (addr == NULL)
 		return ;
 	loc = find_buffer_in_tables(addr);
 	if (loc.map == NULL || loc.buf == NULL)
 	{
-		/* RAISE SIGABRT */
+		char				ptr_name[20];
+
+		ft_itoa_base_to_buf((unsigned long long)addr, "0123456789abcdef", ptr_name, 20);
+		ft_putstr("free  : address : -0x");
+		ft_putendl(ptr_name);
+
 		ft_putstr("Trying to free a non allock'ed buffer\n");
-		(void)(*((void *)0));
+		//raise(SIGABRT);
 	}
-	free_buffer_at(loc);
+	else
+		free_buffer_at(loc);
 }
 
-void	*realloc(void *addr, size_t size)
+void	*realloc(void *addr, size_t size) // do better
 {
-	(void)addr;
-	(void)size;
-	ft_putstr("Realloc was called ... so naive ...\n");
-	return (NULL);
+	t_alloc_location	old_loc;
+	void				*new;
+
+//	ft_putstr("Realloc was called\n");
+	if (addr == NULL)
+		return (malloc(size));
+	old_loc = find_buffer_in_tables(addr);
+	if (old_loc.map == NULL || old_loc.buf == NULL)
+	{
+		ft_putstr("Trying to realloc a non allock'ed buffer\n");
+		raise(SIGABRT);
+	}
+	new = malloc(size);
+	ft_memcpy(get_address_of_loc(old_loc), new, MIN(old_loc.buf->len, size)); //memCcpy ?
+	free_buffer_at(old_loc);
+	return (new);
 }
 
 void	*calloc(size_t count, size_t size)
 {
 	void	*ptr;
 
-	ft_putstr("Calloc was called\n");
+//	ft_putstr("Calloc was called\n");
 	size *= count;
 	ptr = malloc(size);
 	if (ptr)

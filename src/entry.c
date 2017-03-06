@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/03 15:14:01 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/05 19:55:55 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/06 20:29:39 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ t_table_entry			*save_data_to_tables(union u_entry_data data,
 {
 	t_table_entry	*entry;
 	t_table			*table;
+	t_table			*new_table;
 
 	table = g_malloc_infos.tables;
 	entry = NULL;
@@ -71,7 +72,11 @@ t_table_entry			*save_data_to_tables(union u_entry_data data,
 			break;
 		}
 		if (table->next_table == NULL)
-			table->next_table = create_table();
+			if ((new_table = create_table()))
+			{
+				table->next_table = new_table;
+				new_table->prev_table = table;
+			}
 		table = table->next_table;
 	}
 	return (entry);
@@ -80,13 +85,14 @@ t_table_entry			*save_data_to_tables(union u_entry_data data,
 /*
 ** Remove a table_entry from the list it's on, and add it to the free list,
 ** and updates table->occupied_count.
+** Attempts to free the table.
 */
 void					remove_entry_from_tables(union u_entry_data *data)
 {
 	t_table_entry	*entry;
 
-	entry = (t_table_entry *)(data - OFFSET_OF(struct s_table_entry, entry_data));
-	//		container_of(data, struct s_table_entry, entry_data);
+	entry = (t_table_entry *)(((void *)data)
+			- OFFSET_OF(struct s_table_entry, entry_data));
 	if (entry->next_entry)
 		entry->next_entry->prev_entry = entry->prev_entry;
 	if (entry->prev_entry)
@@ -98,4 +104,5 @@ void					remove_entry_from_tables(union u_entry_data *data)
 	entry->next_entry = entry->table->first_free_entry;
 	entry->table->first_free_entry = entry;
 	ft_bzero(&entry->entry_data, sizeof(union u_entry_data)); // debug, remove me
+	try_free_table(entry->table);
 }

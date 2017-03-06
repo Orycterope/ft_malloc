@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/04 14:20:39 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/05 19:41:25 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/06 16:52:24 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,22 +75,20 @@ static void	merge_free_buffers(t_alloc_location alloc)
 	t_buffer	*b;
 	t_buffer	*next;
 
-	need_to_recompute_len = 0;
 	b = alloc.buf;
 	while (b->prev_buf && b->prev_buf->alloc_status == BUFFER_FREE)
 		b = b->prev_buf;
-	if (b->len == alloc.map->shortest_free_buffer)
-		need_to_recompute_len = 1;
-	while (b->next_buf->alloc_status == BUFFER_FREE)
+	need_to_recompute_len = (b->len == alloc.map->shortest_free_buffer);
+	while (b->next_buf && b->next_buf->alloc_status == BUFFER_FREE)
 	{
 		next = b->next_buf;
 		if (next->len == alloc.map->shortest_free_buffer)
 			need_to_recompute_len = 1;
-		next->next_buf->prev_buf = b;
+		if (next->next_buf)
+			next->next_buf->prev_buf = b;
 		b->next_buf = next->next_buf;
 		b->len += next->len;
 		remove_entry_from_tables((union u_entry_data *)next);
-		b = b->next_buf;
 	}
 	if (b->len > alloc.map->longest_free_buffer)
 		alloc.map->longest_free_buffer = b->len;

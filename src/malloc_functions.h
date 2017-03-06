@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 18:54:56 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/05 19:37:35 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/06 19:25:34 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <sys/mman.h>
 
 # define OFFSET_OF(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+# define MIN(A, B) (A < B ? A : B)
 
 /*
 ** page.c

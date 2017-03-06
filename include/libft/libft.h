@@ -6,7 +6,7 @@
 /*   By: tvermeil <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/23 12:24:10 by tvermeil          #+#    #+#             */
-/*   Updated: 2016/05/24 15:16:04 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/06 21:24:48 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,10 @@ int					ft_strncmp(const char *s1, const char *s2, size_t n);
 int					ft_atoi(const char *str);
 char				**ft_strsplit(char	const *s, char c);
 char				*ft_itoa_base(unsigned long long n, char *charset);
+char				*ft_itoa_base_to_buf(unsigned long long n, const char *charset,
+		char *str, size_t max_len);
 char				*ft_itoa(int n);
+char				*ft_itoa_to_buf(int n, char *str, size_t max_len);
 int					ft_numlength(int n);
 int					ft_isalpha(int c);
 int					ft_isdigit(int c);
@@ -98,7 +101,7 @@ int					ft_printf(const char *format, ...);
 int					ft_printf_fd(int fd, const char *format, ...);
 void				ft_lstsort(t_list *lst, int (*cmp_func)(void*, void*));
 void				ft_lstfilter(t_list **lst, int (*filter_func)(void*),
-		void (*free_func)(void*));
+		void	(*free_func)(void*));
 t_list				*ft_lstsplit(t_list *lst, int (*cmp_func)(t_list *));
 
 #endif
