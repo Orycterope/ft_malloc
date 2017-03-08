@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/04 16:18:24 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/04 19:47:26 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/08 04:11:53 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,33 +16,50 @@
 #include "global.h"
 
 /*
-** Searchs for buffer -buf- in mapping -m- and if found it fills -loc-
+** Searchs for buffer -buf- in tables, and returns its table
+** If nothing is found returns NULL
+** If buf is NULL returns NULL.
 */
-static void			find_buffer_mapping(char *buf, t_mapping *m,
-		t_alloc_location	*loc)
+t_table				*find_table_of_buffer(t_buffer *buf)
 {
-	t_buffer	*b;
-	char		*addr;
+	t_table	*t;
+
+	t = g_malloc_infos.tables;
+	while (t && buf)
+	{
+		if ((void *)buf > (void *)t
+				&& (void *)buf < (void *)t + t->mapping_size)
+			return (t);
+		t = t->next_table;
+	}
+	return (NULL);
+}
+
+/*
+** Searchs for buffer at -buf- in mapping -m-.
+** If not found returns NULL
+*/
+static t_buffer		*find_buffer_in_mapping(void *buf_addr, t_mapping *m)
+{
+	t_buffer		*b;
+	char			*addr;
 
 	addr = (char *)m->map_addr;
 	b = m->buffers;
 	while (b)
 	{
-		if (addr == buf)
-		{
-			loc->buf = b;
-			loc->map = m;
-			return ;
-		}
+		if (addr == buf_addr)
+			return (b);
 		addr += b->len;
 		b = b->next_buf;
 	}
+	return (NULL);
 }
 
 /*
-** Computes address of -loc-
+** Computes address of -buf- in -map- mapping.
 */
-void				*get_address_of_loc(t_alloc_location loc)
+void				*get_address_of_loc(t_alloc_loc_reduced loc)
 {
 	t_buffer	*b;
 	char		*addr;
@@ -52,9 +69,7 @@ void				*get_address_of_loc(t_alloc_location loc)
 	while (b)
 	{
 		if (b == loc.buf)
-		{
 			return (addr);
-		}
 		addr += b->len;
 		b = b->next_buf;
 	}
@@ -70,27 +85,54 @@ void				*get_address_of_loc(t_alloc_location loc)
 t_alloc_location	find_buffer_in_tables(void *buf_addr)
 {
 	t_alloc_location	loc;
-	t_table				*t;
-	t_table_entry		*e;
-	t_mapping			*m;
+	int					map_counter;
+
+	loc.m.table = g_malloc_infos.tables;
+	while (loc.m.table)
+	{
+		map_counter = -1;
+		loc.m.map = (t_mapping *)((void *)loc.m.table + sizeof(struct s_table));
+		while (++map_counter < loc.m.table->occupied_maps)
+		{
+			if (buf_addr >= loc.m.map->map_addr
+					&& buf_addr < loc.m.map->map_addr + loc.m.map->map_len)
+			{
+				loc.b.buf = find_buffer_in_mapping(buf_addr, loc.m.map);
+				loc.b.table = find_table_of_buffer(loc.b.buf);
+				if (loc.b.buf == NULL || loc.b.table == NULL)
+					ft_bzero(&loc, sizeof(t_alloc_location));
+				return (loc);
+			}
+			loc.m.map++;
+		}
+		loc.m.table = loc.m.table->next_table;
+	}
+	ft_bzero(&loc, sizeof(t_alloc_location));
+	return (loc);
+}
+
+/*
+** This parses all mappings in search of one having -buf- as its first buffer
+** this is used only for defragmentation of buffers in tables
+*/
+t_mapping			*find_mapping_of_first_buffer(t_buffer *buf)
+{
+	t_table		*t;
+	t_mapping	*m;
+	int			map_counter;
 
 	t = g_malloc_infos.tables;
 	while (t)
 	{
-		e = t->first_mapping_entry;
-		while (e)
+		map_counter = -1;
+		m = (t_mapping *)((void *)t + sizeof(struct s_table));
+		while (++map_counter < t->occupied_maps)
 		{
-			m = &e->entry_data.map;
-			if (buf_addr >= m->map_addr && buf_addr < m->map_addr + m->map_len)
-			{
-				find_buffer_mapping(buf_addr, m, &loc);
-				return (loc);
-			}
-			e = e->next_entry;
+			if (m->buffers == buf)
+				return (m);
+			m++;
 		}
 		t = t->next_table;
 	}
-	loc.buf = NULL;
-	loc.map = NULL;
-	return (loc);
+	return (NULL);
 }

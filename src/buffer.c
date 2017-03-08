@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/04 14:20:39 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/06 16:52:24 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/08 02:57:32 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,16 @@
 static int	split_free_buffer(t_buffer *buf, size_t first_size)
 {
 	t_buffer		new_buf;
-	t_table_entry	*new_buf_entry;
 	t_buffer		*new_buf_saved_location;
 
 	new_buf.len = buf->len - first_size;
 	new_buf.alloc_status = BUFFER_FREE;
 	new_buf.next_buf = buf->next_buf;
 	new_buf.prev_buf = buf;
-	new_buf_entry = save_data_to_tables((union u_entry_data)new_buf, ENTRY_BUFFER);
-	if (new_buf_entry == NULL)
+	new_buf_saved_location = save_buffer_to_tables(new_buf).buf;
+	if (new_buf_saved_location == NULL)
 		return (1);
-	new_buf_saved_location = &new_buf_entry->entry_data.buf;
-	if (buf->next_buf != NULL)
+	if (buf->next_buf)
 		buf->next_buf->prev_buf = new_buf_saved_location;
 	buf->next_buf = new_buf_saved_location;
 	buf->len = first_size;
@@ -47,13 +45,13 @@ static int	split_free_buffer(t_buffer *buf, size_t first_size)
 ** alloc must be a valid alloc location
 ** Returns 0, but on error returns 1.
 */
-int			create_allocation(t_alloc_location alloc, size_t desired_size)
+int			create_allocation(t_alloc_loc_reduced alloc, size_t desired_size)
 {
 	int		need_to_recompute_len;
 
 	need_to_recompute_len = 0;
 	if (alloc.buf->len == alloc.map->longest_free_buffer
-			|| alloc.buf->len == alloc.map->longest_free_buffer)
+			|| alloc.buf->len == alloc.map->shortest_free_buffer)
 		need_to_recompute_len = 1;
 	if (alloc.buf->len != desired_size)
 	{
@@ -69,11 +67,11 @@ int			create_allocation(t_alloc_location alloc, size_t desired_size)
 /*
 ** Merges consecutives free buffers, and recomputes best_len if needed.
 */
-static void	merge_free_buffers(t_alloc_location alloc)
+static void	merge_free_buffers(t_alloc_loc_reduced alloc)
 {
-	int			need_to_recompute_len;
-	t_buffer	*b;
-	t_buffer	*next;
+	int				need_to_recompute_len;
+	t_buffer		*b;
+	t_buf_location	next;
 
 	b = alloc.buf;
 	while (b->prev_buf && b->prev_buf->alloc_status == BUFFER_FREE)
@@ -81,14 +79,15 @@ static void	merge_free_buffers(t_alloc_location alloc)
 	need_to_recompute_len = (b->len == alloc.map->shortest_free_buffer);
 	while (b->next_buf && b->next_buf->alloc_status == BUFFER_FREE)
 	{
-		next = b->next_buf;
-		if (next->len == alloc.map->shortest_free_buffer)
+		next.buf = b->next_buf;
+		next.table = find_table_of_buffer(b->next_buf);
+		if (next.buf->len == alloc.map->shortest_free_buffer)
 			need_to_recompute_len = 1;
-		if (next->next_buf)
-			next->next_buf->prev_buf = b;
-		b->next_buf = next->next_buf;
-		b->len += next->len;
-		remove_entry_from_tables((union u_entry_data *)next);
+		if (next.buf->next_buf)
+			next.buf->next_buf->prev_buf = b;
+		b->next_buf = next.buf->next_buf;
+		b->len += next.buf->len;
+		remove_buffer_from_tables(next);
 	}
 	if (b->len > alloc.map->longest_free_buffer)
 		alloc.map->longest_free_buffer = b->len;
@@ -102,19 +101,20 @@ static void	merge_free_buffers(t_alloc_location alloc)
 */
 static int	is_only_mapping_of_type(enum e_mapping_type type, t_mapping *map)
 {
-	t_table			*t;
-	t_table_entry	*e;
+	t_table		*t;
+	t_mapping	*m;
+	int			map_counter;
 
 	t = g_malloc_infos.tables;
 	while (t)
 	{
-		e = t->first_mapping_entry;
-		while (e)
+		map_counter = -1;
+		m = (t_mapping *)((void *)t + sizeof(struct s_table));
+		while (++map_counter < t->occupied_maps)
 		{
-			if (e->entry_data.map.mapping_type == type
-				&& !(&e->entry_data.map == map))
+			if (m->mapping_type == type && !(m == map))
 				return (0);
-			e = e->next_entry;
+			m++;
 		}
 		t = t->next_table;
 	}
@@ -128,11 +128,14 @@ static int	is_only_mapping_of_type(enum e_mapping_type type, t_mapping *map)
 ** this type, so we always keep at least one mapping of each type.
 ** -alloc- must contain valid pointers.
 */
-void		free_buffer_at(t_alloc_location alloc)
+void		free_buffer_at(t_alloc_location loc)
 {
-	int	should_free_mapping;
+	int					should_free_mapping;
+	t_alloc_loc_reduced	alloc;
 
 	should_free_mapping = 0;
+	alloc.buf = loc.b.buf;
+	alloc.map = loc.m.map;
 	alloc.buf->alloc_status = BUFFER_FREE;
 	merge_free_buffers(alloc);
 	if (alloc.map->mapping_type == MAPPING_LARGE)
@@ -143,7 +146,12 @@ void		free_buffer_at(t_alloc_location alloc)
 		should_free_mapping = 1;
 	if (should_free_mapping)
 	{
+		t_buf_location	map_first_buf;
+
+		map_first_buf.buf = alloc.map->buffers;
+		map_first_buf.table = find_table_of_buffer(alloc.map->buffers);
+		remove_buffer_from_tables(map_first_buf);
 		munmap(alloc.map->map_addr, alloc.map->map_len);
-		remove_entry_from_tables((union u_entry_data *)alloc.map);
+		remove_mapping_from_tables(loc.m);
 	}
 }

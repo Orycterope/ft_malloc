@@ -6,7 +6,7 @@
 #    By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/12/18 19:13:31 by tvermeil          #+#    #+#              #
-#    Updated: 2017/03/06 21:39:04 by tvermeil         ###   ########.fr        #
+#    Updated: 2017/03/08 05:36:49 by tvermeil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,6 @@ endif
 
 GENERIC_NAME = libft_malloc.so
 NAME = libft_malloc_$(HOSTTYPE).so
-#NAME = libft_malloc_$(HOSTTYPE).a
 
 SRC_PATH = src
 HEADER_PATH = include/malloc
@@ -37,7 +36,6 @@ CC = gcc -g
 CFLAGS = -Wall -Wextra -Werror -fPIC
 CPPFLAGS = $(addprefix -I ,$(INC_PATH))
 LDFLAGS = -L$(LFT_PATH) -fPIC -shared 
-#LDFLAGS = -L$(LFT_PATH) 
 LDLIBS = -lft 
 
 SRC_NAME =		malloc.c \
@@ -72,10 +70,7 @@ $(OBJ_PATH)%.o: $(SRC_PATH)%.c $(HEADER_FILES) libft.a
 	@echo -n .
 
 $(DST): $(OBJ) $(HEADER_FILES)
-	# dynamic :
 	@$(CC) $(OBJ) $(LDFLAGS) $(LDLIBS) -o $(DST)
-	# static :
-	#@ar rcs $(NAME) $(OBJ) #
 	@-cd $(DST_PATH) && ln -sf $(NAME) $(GENERIC_NAME)
 	@echo " . \033[32m$(NAME)\033[0m done"
 

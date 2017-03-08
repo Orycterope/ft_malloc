@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/03 17:42:26 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/05 18:47:59 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/08 04:33:15 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +35,19 @@ size_t						get_page_mapping_size(size_t desired)
 
 	type = get_mapping_type(desired);
 	if (type == MAPPING_TINY)
-		size = 100 * TINY_SIZE;
+		size = MIN_BLOCK_PER_MAPPING * TINY_SIZE;
 	else if (type == MAPPING_SMALL)
-		size = 100 * SMALL_SIZE;
+		size = MIN_BLOCK_PER_MAPPING * SMALL_SIZE;
 	else
 		size = desired;
 	return (round_upper_page_size(size));
 }
 
-inline size_t					round_upper_page_size(size_t size)
+inline size_t				round_upper_page_size(size_t size)
 {
 	if (size % g_malloc_infos.page_size == 0)
 		return (size);
 	else
-		return (size + 4096 - (size % g_malloc_infos.page_size));
+		return (size + g_malloc_infos.page_size
+				- (size % g_malloc_infos.page_size));
 }

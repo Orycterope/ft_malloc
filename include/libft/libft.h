@@ -6,7 +6,7 @@
 /*   By: tvermeil <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/23 12:24:10 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/06 21:24:48 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/08 05:21:22 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void				*ft_memset(void *b, int c, size_t len);
 void				ft_bzero(void *s, size_t n);
 void				*ft_memcpy(void *dst, const void *src, size_t n);
 void				*ft_memccpy(void *dst, const void *src, int c, size_t n);
+void				*ft_memcpy_overlap(void *dst, void *src, size_t len);
 void				*ft_memmove(void *dst, const void *src, size_t len);
 void				*ft_memchr(const void *s, int c, size_t n);
 int					ft_memcmp(const void *s1, const void *s2, size_t n);
@@ -47,7 +48,7 @@ int					ft_atoi(const char *str);
 char				**ft_strsplit(char	const *s, char c);
 char				*ft_itoa_base(unsigned long long n, char *charset);
 char				*ft_itoa_base_to_buf(unsigned long long n, const char *charset,
-		char *str, size_t max_len);
+		char	*str, size_t max_len);
 char				*ft_itoa(int n);
 char				*ft_itoa_to_buf(int n, char *str, size_t max_len);
 int					ft_numlength(int n);

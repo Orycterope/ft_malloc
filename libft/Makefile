@@ -6,7 +6,7 @@
 #    By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/03/11 16:50:07 by tvermeil          #+#    #+#              #
-#    Updated: 2017/03/06 21:25:18 by tvermeil         ###   ########.fr        #
+#    Updated: 2017/03/08 05:22:42 by tvermeil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,6 +24,7 @@ SRC_NAME =		ft_memset.c \
 		    	ft_bzero.c \
    		    	ft_memcpy.c \
    		    	ft_memccpy.c \
+				ft_memcpy_overlap.c \
    		    	ft_memmove.c \
    		    	ft_memchr.c \
    		    	ft_memcmp.c \

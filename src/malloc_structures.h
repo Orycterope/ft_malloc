@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 15:55:45 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/04 15:11:52 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/08 01:30:02 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,6 @@
 # define MALLOC_STRUCTURES_H
 
 # include "malloc.h"
-
-enum						e_entry_status //
-{
-	ENTRY_FREE,
-	ENTRY_OCCUPIED
-};
 
 enum						e_buffer_status
 {
@@ -37,9 +31,9 @@ enum						e_buffer_status
 typedef struct				s_buffer
 {
 	size_t					len;
-	enum e_buffer_status	alloc_status;
 	struct s_buffer			*next_buf;
 	struct s_buffer			*prev_buf;
+	enum e_buffer_status	alloc_status;
 }							t_buffer;
 
 enum						e_mapping_type
@@ -68,22 +62,6 @@ typedef struct				s_mapping
 }							t_mapping;
 
 /*
-** We want to treat table entries the same way regardless of content,
-** so we put them in an union in the t_table_entry struct.
-*/
-enum						e_entry_type
-{
-	ENTRY_MAPPING,
-	ENTRY_BUFFER
-};
-
-union						u_entry_data
-{
-	t_mapping				map;
-	t_buffer				buf;
-};
-
-/*
 ** Describes a table entry, containing either a t_mapping or a t_buffer
 ** table :	a pointer back to the table header struct
 **			used by buffers with container_of()
@@ -93,34 +71,51 @@ union						u_entry_data
 **			   when t_buffer :	not used
 ** entry_type : t_mapping or t_buffer
 ** entry_data : the union
-*/
 typedef struct				s_table_entry
 {
 	struct s_table			*table;
-	//enum e_entry_status	entry_status;
 	struct s_table_entry	*next_entry;
 	struct s_table_entry	*prev_entry;
-	//enum e_entry_type		entry_type;
 	union u_entry_data		entry_data;
 }							t_table_entry;
+*/
 
 /*
 ** Describes the header of a table of t_mapping and t_buffers
+** The structure of a table is as follow :
+** t-------------------------t
+** | h---------------------h |
+** | |    t_table header   | |
+** | h---------------------h |
+** | m-----m m-----m m-----m |
+** | | map | | map | | map | |
+** | m-----m m-----m m-----m |   occupied_maps = 4
+** | m-----m                 |
+** | | map |    |            |
+** | m-----m    V            |
+** |                         |
+** |                         |
+** |                         |
+** |            ^    b-----b |
+** |            |    | buf | |
+** |                 b-----b |
+** | b-----b b-----b b-----b |
+** | | buf | | buf | | buf | |   occupied_buffers = 7
+** | b-----b b-----b b-----b |
+** | b-----b b-----b b-----b |
+** | | buf | | buf | | buf | |
+** | b-----b b-----b b-----b |
+** t-------------------------t
 ** mapping_size : used to unmap
-** table_len : the number of entries in this table
 ** occupied_count : the number of occupied entries in this table
 **					if count is 0 we can free this table
-** first_free_entry :		chained list of all free entries of this table
-** first_mapping_entry :	chained list of all t_mapping entries of this table
 ** next/prev table : chained list of tables
 */
 typedef struct				s_table
 {
 	size_t					mapping_size;
-	int						table_len;
-	int						occupied_count;
-	t_table_entry			*first_free_entry;
-	t_table_entry			*first_mapping_entry;
+	int						occupied_maps;
+	int						occupied_buffers;
 	struct s_table			*next_table;
 	struct s_table			*prev_table;
 }							t_table;
@@ -135,12 +130,45 @@ typedef struct
 }							t_general_struct;
 
 /*
-** A struct to save an allocation best location
+** A struct to pass a mapping and its table
 */
 typedef struct
 {
 	t_mapping				*map;
+	t_table					*table;
+}							t_map_location;
+
+/*
+** A struct to pass a buffer and its table
+*/
+typedef struct
+{
 	t_buffer				*buf;
+	t_table					*table;
+}							t_buf_location;
+
+/*
+** A struct to save an allocation location
+*/
+typedef struct
+{
+	t_map_location			m;
+	t_buf_location			b;
 }							t_alloc_location;
+
+typedef struct
+{
+	t_mapping				*map;
+	t_buffer				*buf;
+}							t_alloc_loc_reduced;
+
+/*
+** Enum to pass as parameter
+*/
+enum	e_entry_type
+{
+	ENTRY_MAPPING,
+	ENTRY_BUFFER
+};
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 17:12:41 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/05 17:58:36 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/08 01:31:33 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,49 +15,44 @@
 #include "malloc_functions.h"
 #include "global.h"
 
-static void	init_free_entry(t_table *header, int index)
+/*
+** A funciton to know if a table as enough room to store the type
+** described by -type-
+*/
+int			table_has_room_for(t_table *table, enum e_entry_type type)
 {
-	t_table_entry	*entry;
+	size_t	remaining_size;
 
-	entry = (void *)header->first_free_entry + index * sizeof(t_table_entry);
-	//entry->entry_status = ENTRY_FREE;
-	if (index == 0)
-		entry->prev_entry = NULL;
+	remaining_size = table->mapping_size
+		- sizeof(struct s_table)
+		- table->occupied_maps * sizeof(struct s_mapping)
+		- table->occupied_buffers * sizeof(struct s_buffer);
+	if (type == ENTRY_MAPPING)
+		return (remaining_size >= sizeof(struct s_mapping));
 	else
-		entry->prev_entry = entry - 1;
-	if (index + 1 == header->table_len)
-		entry->next_entry = NULL;
-	else
-		entry->next_entry = entry + 1;
+		return (remaining_size >= sizeof(struct s_buffer));
 }
 
 t_table		*create_table(void)
 {
 	size_t	mapping_size;
 	t_table	*header;
-	int		i;
 
 	mapping_size = round_upper_page_size(sizeof(t_table)
-			+ sizeof(t_table_entry) * MIN_ENTRIES_PER_TABLE);
+			+ MAX(sizeof(t_buffer), sizeof(t_mapping)) * MIN_ENTRIES_PER_TABLE);
 	header = (t_table *)mmap(NULL, mapping_size, MMAP_PARAMETERS);
 	header = (header == MAP_FAILED) ? NULL : header;
 	if (header != NULL)
 	{
 		ft_bzero(header, sizeof(*header));
 		header->mapping_size = mapping_size;
-		header->table_len =
-			(mapping_size - sizeof(*header)) / sizeof(t_table_entry);
-		header->first_free_entry = (t_table_entry *)((void *)header + sizeof(*header));
-		i = -1;
-		while (++i < header->table_len)
-			init_free_entry(header, i);
 	}
 	return (header);
 }
 
 void		try_free_table(t_table *table)
 {
-	if (table->occupied_count != 0)
+	if (table->occupied_maps != 0 || table->occupied_buffers != 0)
 		return ;
 	if (table == g_malloc_infos.tables && table->next_table == NULL)
 		return ;
