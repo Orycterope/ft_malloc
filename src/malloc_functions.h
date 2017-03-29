@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 18:54:56 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/08 01:31:13 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/29 17:00:48 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,11 @@ void					remove_buffer_from_tables(t_buf_location loc);
 t_alloc_loc_reduced		find_best_mapping_for_size(size_t size);
 
 /*
+** delete_mapping.c
+*/
+void					try_delete_mapping(t_map_location m);
+
+/*
 ** len_counters.c
 */
 void					recompute_best_len(t_mapping *map);
@@ -67,6 +72,13 @@ t_mapping				*find_mapping_of_first_buffer(t_buffer *buf);
 */
 int						create_allocation(t_alloc_loc_reduced alloc,
 		size_t desired_size);
-void					free_buffer_at(t_alloc_location alloc);
+void					free_buffer_at(t_alloc_location loc,
+		int should_try_free_mapping);
+void					*resize_buffer(t_alloc_loc_reduced loc, size_t new_size);
+
+/*
+** location_utils.c
+*/
+t_alloc_loc_reduced		to_reduced_location(t_alloc_location loc);
 
 #endif

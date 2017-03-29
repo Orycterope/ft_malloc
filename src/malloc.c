@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 17:00:21 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/08 05:36:23 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/29 17:40:14 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void				*malloc(size_t size)
 	ft_putstr("Malloc was called\n");
 	if (size == 0)
 		return (NULL);
+	//size += 100;
 	if (g_malloc_infos.page_size == 0)
 		g_malloc_infos.page_size = getpagesize();
 	if (g_malloc_infos.tables == NULL)
@@ -46,15 +47,15 @@ void				*malloc(size_t size)
 		ft_putstr("Mmmhh ... final splitting failed\n");
 		return (NULL);
 	}
-/*
+
 	char				ptr_name[20];
 
 	ft_itoa_base_to_buf((unsigned long long)get_address_of_loc(loc), "0123456789abcdef", ptr_name, 20);
 	ft_putstr("malloc: address : +0x");
 	ft_putendl(ptr_name);
-*/
 
-	//ft_putstr("malloc seems ... ok ???\n");
+
+	ft_putstr("malloc seems ... ok ???\n");
 	return (get_address_of_loc(loc));
 }
 
@@ -78,33 +79,37 @@ void				free(void *addr)
 		//raise(SIGABRT);
 	}
 	else
-		free_buffer_at(loc);
+		free_buffer_at(loc, 1);
 }
 
-void				*realloc(void *addr, size_t size) // do better
+void				*realloc(void *addr, size_t desired_size)
 {
 	t_alloc_location	old;
 	void				*new;
 
-	ft_putstr("Realloc was called\n");
-	if (addr == NULL)
-		return (malloc(size));
+	ft_putstr("--Realloc was called\n"); //
+	if (addr == NULL || desired_size == 0)
+	{
+		free(addr);
+		return (malloc(desired_size));
+	}
 	old = find_buffer_in_tables(addr);
 	if (old.b.buf == NULL)
 	{
 		ft_putstr("Trying to realloc a non allock'ed buffer\n");
-		raise(SIGABRT);
+	//	raise(SIGABRT);
+		return (NULL); //
 	}
-	/*if (old.b.buf->next_buf && old.b.buf->next_buf->alloc_status == BUFFER_FREE
-			&& old.b.buf->len + old.b.buf->next_buf->len >= desired_size)
-	{
-		m
-	}
-	else
-	{*/
-	new = malloc(size);
-	ft_memcpy(addr, new, MIN(old.b.buf->len, size)); //memCcpy ?
-	free_buffer_at(old);
+	if (desired_size == old.b.buf->len)
+		return (addr);
+	if (desired_size < old.b.buf->len || (old.b.buf->next_buf
+			&& old.b.buf->next_buf->alloc_status == BUFFER_FREE
+			&& old.b.buf->len + old.b.buf->next_buf->len >= desired_size))
+		return (resize_buffer(to_reduced_location(old), desired_size));
+	free_buffer_at(old, 0);
+	new = malloc(desired_size);
+	ft_memcpy_overlap(new, addr, MIN(old.b.buf->len, desired_size));
+	try_delete_mapping(old.m);
 	return (new);
 }
 

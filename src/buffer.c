@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/04 14:20:39 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/08 02:57:32 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/29 18:42:06 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 ** and the second one the remaining size. Also updates linked lists.
 ** Returns 0, but on error returns 1.
 */
-static int	split_free_buffer(t_buffer *buf, size_t first_size)
+static int	split_buffer(t_buffer *buf, size_t first_size)
 {
 	t_buffer		new_buf;
 	t_buffer		*new_buf_saved_location;
@@ -55,7 +55,7 @@ int			create_allocation(t_alloc_loc_reduced alloc, size_t desired_size)
 		need_to_recompute_len = 1;
 	if (alloc.buf->len != desired_size)
 	{
-		if (split_free_buffer(alloc.buf, desired_size))
+		if (split_buffer(alloc.buf, desired_size))
 			return (1);
 	}
 	alloc.buf->alloc_status = BUFFER_ALLOCATED;
@@ -96,62 +96,58 @@ static void	merge_free_buffers(t_alloc_loc_reduced alloc)
 }
 
 /*
-** Parses all mappings and returns if there are other mapping of the same type
-** Used to allways keep at least one mapping of each type.
-*/
-static int	is_only_mapping_of_type(enum e_mapping_type type, t_mapping *map)
-{
-	t_table		*t;
-	t_mapping	*m;
-	int			map_counter;
-
-	t = g_malloc_infos.tables;
-	while (t)
-	{
-		map_counter = -1;
-		m = (t_mapping *)((void *)t + sizeof(struct s_table));
-		while (++map_counter < t->occupied_maps)
-		{
-			if (m->mapping_type == type && !(m == map))
-				return (0);
-			m++;
-		}
-		t = t->next_table;
-	}
-	return (1);
-}
-
-/*
 ** Marks the buffer as free, merge it with consecutives free buffers,
 ** and recompute mapping best_len if needed.
-** If the mapping is empty afterward, unmap it unless it is the only mapping of
-** this type, so we always keep at least one mapping of each type.
+** If the mapping is empty afterward, and -should_try_free_mapping- is not 0
+** call try_delete_mapping.
 ** -alloc- must contain valid pointers.
 */
-void		free_buffer_at(t_alloc_location loc)
+void		free_buffer_at(t_alloc_location loc, int should_try_free_mapping)
 {
-	int					should_free_mapping;
 	t_alloc_loc_reduced	alloc;
 
-	should_free_mapping = 0;
 	alloc.buf = loc.b.buf;
 	alloc.map = loc.m.map;
 	alloc.buf->alloc_status = BUFFER_FREE;
 	merge_free_buffers(alloc);
-	if (alloc.map->mapping_type == MAPPING_LARGE)
-		should_free_mapping = 1;
-	else if (alloc.map->buffers->alloc_status == BUFFER_FREE
-			&& alloc.map->buffers->next_buf == NULL
-			&& !is_only_mapping_of_type(alloc.map->mapping_type, alloc.map))
-		should_free_mapping = 1;
-	if (should_free_mapping)
-	{
-		t_buf_location	map_first_buf;
+	if (should_try_free_mapping)
+		try_delete_mapping(loc.m);
+}
 
-		map_first_buf.buf = alloc.map->buffers;
-		map_first_buf.table = find_table_of_buffer(alloc.map->buffers);
-		remove_buffer_from_tables(map_first_buf);
-		munmap(alloc.map->map_addr, alloc.map->map_len);
-		remove_mapping_from_tables(loc.m);
+/*
+** Change the size of an alloc'ed buffer and adjust following buffer's size
+** If the buffer is getting bigger, and following free space is reduced to 0,
+** 		delete the zero size buffer.
+** If the buffer is getting smaller, and no free space is following,
+** 		create a free_buffer and isert it inbetween.
+**		If creation failed, returns NULL.
+** Returns the computed address of the buffer.
+*/
+void		*resize_buffer(t_alloc_loc_reduced loc, size_t new_size)
+{
+	size_t			old_size;
+	t_buf_location	next_buf;
+
+	old_size = loc.buf->len;
+	if (old_size < new_size && (loc.buf->next_buf == NULL
+				|| loc.buf->next_buf->alloc_status == BUFFER_ALLOCATED))
+	{
+		if (split_buffer(loc.buf, new_size))
+			return (NULL);
 	}
+	else
+	{
+		if (old_size < new_size)
+			loc.buf->next_buf->len -= new_size - old_size;
+		else
+			loc.buf->next_buf->len += old_size - new_size;
+		loc.buf->len = new_size;
+		if (loc.buf->next_buf->len == 0)
+		{
+			next_buf.buf = loc.buf->next_buf;
+			next_buf.table = find_table_of_buffer(loc.buf->next_buf);
+			remove_buffer_from_tables(next_buf);
+		}
+	}
+	return (get_address_of_loc(loc));
 }

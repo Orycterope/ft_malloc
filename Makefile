@@ -6,7 +6,7 @@
 #    By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/12/18 19:13:31 by tvermeil          #+#    #+#              #
-#    Updated: 2017/03/08 05:36:49 by tvermeil         ###   ########.fr        #
+#    Updated: 2017/03/29 17:01:48 by tvermeil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,9 +43,11 @@ SRC_NAME =		malloc.c \
 				entry.c \
 				page.c \
 				mapping.c \
+				delete_mapping.c \
 				len_counters.c \
 				search.c \
 				buffer.c \
+				location_utils.c \
 
 HEADER_NAME =	malloc.h \
 
