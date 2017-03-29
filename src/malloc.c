@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 17:00:21 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/29 17:40:14 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/29 21:04:29 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void				*malloc(size_t size)
 {
 	t_alloc_loc_reduced	loc;
 
-	ft_putstr("Malloc was called\n");
+	//ft_putstr("Malloc was called\n");
 	if (size == 0)
 		return (NULL);
 	//size += 100;
@@ -47,7 +47,7 @@ void				*malloc(size_t size)
 		ft_putstr("Mmmhh ... final splitting failed\n");
 		return (NULL);
 	}
-
+/*
 	char				ptr_name[20];
 
 	ft_itoa_base_to_buf((unsigned long long)get_address_of_loc(loc), "0123456789abcdef", ptr_name, 20);
@@ -56,6 +56,7 @@ void				*malloc(size_t size)
 
 
 	ft_putstr("malloc seems ... ok ???\n");
+*/
 	return (get_address_of_loc(loc));
 }
 
@@ -63,7 +64,7 @@ void				free(void *addr)
 {
 	t_alloc_location	loc;
 
-	ft_putstr("Free was called\n");
+//	ft_putstr("Free was called\n");
 	if (addr == NULL)
 		return ;
 	loc = find_buffer_in_tables(addr);

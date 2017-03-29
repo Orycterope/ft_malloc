@@ -6,7 +6,7 @@
 #    By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/12/18 19:13:31 by tvermeil          #+#    #+#              #
-#    Updated: 2017/03/29 17:01:48 by tvermeil         ###   ########.fr        #
+#    Updated: 2017/03/29 20:54:08 by tvermeil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -48,6 +48,7 @@ SRC_NAME =		malloc.c \
 				search.c \
 				buffer.c \
 				location_utils.c \
+				show_alloc_mem.c \
 
 HEADER_NAME =	malloc.h \
 
