@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 15:55:45 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/30 17:21:33 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 18:40:52 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ typedef struct				s_map_location
 /*
 ** A struct to pass a buffer and its table
 */
-typedef struct 				s_buf_location;
+typedef struct				s_buf_location
 {
 	t_buffer				*buf;
 	t_table					*table;
@@ -133,13 +133,13 @@ typedef struct 				s_buf_location;
 /*
 ** A struct to save an allocation location
 */
-typedef struct 				s_alloc_location;
+typedef struct				s_alloc_location
 {
 	t_map_location			m;
 	t_buf_location			b;
 }							t_alloc_location;
 
-typedef struct				s_alloc_loc_reduced;
+typedef struct				s_alloc_loc_reduced
 {
 	t_mapping				*map;
 	t_buffer				*buf;
