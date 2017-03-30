@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 18:54:56 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/29 17:00:48 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 14:10:51 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,5 +80,11 @@ void					*resize_buffer(t_alloc_loc_reduced loc, size_t new_size);
 ** location_utils.c
 */
 t_alloc_loc_reduced		to_reduced_location(t_alloc_location loc);
+
+/*
+** mutex.c
+*/
+void					*unlock_mutex(void *retrurn_value);
+void					lock_mutex(void);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 17:00:21 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/29 21:04:29 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 14:30:44 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@
 t_general_struct	g_malloc_infos =
 {
 	.page_size = 0,
-	.tables = NULL
+	.tables = NULL,
+	.mutex = PTHREAD_MUTEX_INITIALIZER
 };
 
 void				*malloc(size_t size)
@@ -30,22 +31,23 @@ void				*malloc(size_t size)
 	if (size == 0)
 		return (NULL);
 	//size += 100;
+	lock_mutex();
 	if (g_malloc_infos.page_size == 0)
 		g_malloc_infos.page_size = getpagesize();
 	if (g_malloc_infos.tables == NULL)
 		g_malloc_infos.tables = create_table();
 	if (g_malloc_infos.tables == NULL)
-		return (NULL);
+		return (unlock_mutex(NULL));
 	loc = find_best_mapping_for_size(size);
 	if (loc.buf == NULL || loc.map == NULL)
 	{
 		ft_putstr("Mmmhh ... didn't find a good spot\n");
-		return (NULL);
+		return (unlock_mutex(NULL));
 	}
 	if (create_allocation(loc, size))
 	{
 		ft_putstr("Mmmhh ... final splitting failed\n");
-		return (NULL);
+		return (unlock_mutex(NULL));
 	}
 /*
 	char				ptr_name[20];
@@ -57,7 +59,7 @@ void				*malloc(size_t size)
 
 	ft_putstr("malloc seems ... ok ???\n");
 */
-	return (get_address_of_loc(loc));
+	return (unlock_mutex(get_address_of_loc(loc)));
 }
 
 void				free(void *addr)
@@ -67,6 +69,7 @@ void				free(void *addr)
 //	ft_putstr("Free was called\n");
 	if (addr == NULL)
 		return ;
+	lock_mutex();
 	loc = find_buffer_in_tables(addr);
 	if (loc.b.buf == NULL)
 	{
@@ -81,6 +84,7 @@ void				free(void *addr)
 	}
 	else
 		free_buffer_at(loc, 1);
+	unlock_mutex(NULL);
 }
 
 void				*realloc(void *addr, size_t desired_size)
@@ -94,24 +98,27 @@ void				*realloc(void *addr, size_t desired_size)
 		free(addr);
 		return (malloc(desired_size));
 	}
+	lock_mutex();
 	old = find_buffer_in_tables(addr);
 	if (old.b.buf == NULL)
 	{
 		ft_putstr("Trying to realloc a non allock'ed buffer\n");
 	//	raise(SIGABRT);
-		return (NULL); //
+		return (unlock_mutex(NULL)); //
 	}
 	if (desired_size == old.b.buf->len)
-		return (addr);
+		return (unlock_mutex(addr));
 	if (desired_size < old.b.buf->len || (old.b.buf->next_buf
 			&& old.b.buf->next_buf->alloc_status == BUFFER_FREE
 			&& old.b.buf->len + old.b.buf->next_buf->len >= desired_size))
-		return (resize_buffer(to_reduced_location(old), desired_size));
+		return (unlock_mutex(resize_buffer(to_reduced_location(old), desired_size)));
 	free_buffer_at(old, 0);
+	unlock_mutex(NULL);
 	new = malloc(desired_size);
+	lock_mutex();
 	ft_memcpy_overlap(new, addr, MIN(old.b.buf->len, desired_size));
 	try_delete_mapping(old.m);
-	return (new);
+	return (unlock_mutex(new));
 }
 
 void				*calloc(size_t count, size_t size)

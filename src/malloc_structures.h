@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 15:55:45 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/08 01:30:02 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 14:03:26 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MALLOC_STRUCTURES_H
 
 # include "malloc.h"
+# include <pthread.h>
 
 enum						e_buffer_status
 {
@@ -127,6 +128,7 @@ typedef struct
 {
 	size_t					page_size;
 	struct s_table			*tables;
+	pthread_mutex_t			mutex;
 }							t_general_struct;
 
 /*
