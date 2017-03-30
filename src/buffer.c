@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/04 14:20:39 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/29 18:42:06 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 15:58:32 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 ** and the second one the remaining size. Also updates linked lists.
 ** Returns 0, but on error returns 1.
 */
+
 static int	split_buffer(t_buffer *buf, size_t first_size)
 {
 	t_buffer		new_buf;
@@ -45,6 +46,7 @@ static int	split_buffer(t_buffer *buf, size_t first_size)
 ** alloc must be a valid alloc location
 ** Returns 0, but on error returns 1.
 */
+
 int			create_allocation(t_alloc_loc_reduced alloc, size_t desired_size)
 {
 	int		need_to_recompute_len;
@@ -67,6 +69,7 @@ int			create_allocation(t_alloc_loc_reduced alloc, size_t desired_size)
 /*
 ** Merges consecutives free buffers, and recomputes best_len if needed.
 */
+
 static void	merge_free_buffers(t_alloc_loc_reduced alloc)
 {
 	int				need_to_recompute_len;
@@ -102,6 +105,7 @@ static void	merge_free_buffers(t_alloc_loc_reduced alloc)
 ** call try_delete_mapping.
 ** -alloc- must contain valid pointers.
 */
+
 void		free_buffer_at(t_alloc_location loc, int should_try_free_mapping)
 {
 	t_alloc_loc_reduced	alloc;
@@ -123,6 +127,7 @@ void		free_buffer_at(t_alloc_location loc, int should_try_free_mapping)
 **		If creation failed, returns NULL.
 ** Returns the computed address of the buffer.
 */
+
 void		*resize_buffer(t_alloc_loc_reduced loc, size_t new_size)
 {
 	size_t			old_size;

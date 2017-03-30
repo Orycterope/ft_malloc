@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 15:55:45 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/30 14:03:26 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 17:21:33 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,25 +63,6 @@ typedef struct				s_mapping
 }							t_mapping;
 
 /*
-** Describes a table entry, containing either a t_mapping or a t_buffer
-** table :	a pointer back to the table header struct
-**			used by buffers with container_of()
-** entry_status : free or occupied
-** next/prev : when free :		pointer to the next free entry in this table
-**			   when t_mapping :	pointer to the next t_mapping in this table
-**			   when t_buffer :	not used
-** entry_type : t_mapping or t_buffer
-** entry_data : the union
-typedef struct				s_table_entry
-{
-	struct s_table			*table;
-	struct s_table_entry	*next_entry;
-	struct s_table_entry	*prev_entry;
-	union u_entry_data		entry_data;
-}							t_table_entry;
-*/
-
-/*
 ** Describes the header of a table of t_mapping and t_buffers
 ** The structure of a table is as follow :
 ** t-------------------------t
@@ -124,7 +105,7 @@ typedef struct				s_table
 /*
 ** Used as a global variable
 */
-typedef struct
+typedef struct				s_genereal_struct
 {
 	size_t					page_size;
 	struct s_table			*tables;
@@ -134,7 +115,7 @@ typedef struct
 /*
 ** A struct to pass a mapping and its table
 */
-typedef struct
+typedef struct				s_map_location
 {
 	t_mapping				*map;
 	t_table					*table;
@@ -143,7 +124,7 @@ typedef struct
 /*
 ** A struct to pass a buffer and its table
 */
-typedef struct
+typedef struct 				s_buf_location;
 {
 	t_buffer				*buf;
 	t_table					*table;
@@ -152,13 +133,13 @@ typedef struct
 /*
 ** A struct to save an allocation location
 */
-typedef struct
+typedef struct 				s_alloc_location;
 {
 	t_map_location			m;
 	t_buf_location			b;
 }							t_alloc_location;
 
-typedef struct
+typedef struct				s_alloc_loc_reduced;
 {
 	t_mapping				*map;
 	t_buffer				*buf;

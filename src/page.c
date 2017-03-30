@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/03 17:42:26 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/08 04:33:15 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 17:17:02 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 /*
 ** Returns the type TINY/SMALL/LARGE corresponding to -size-
 */
+
 inline enum e_mapping_type	get_mapping_type(size_t size)
 {
 	if (size <= TINY_SIZE)

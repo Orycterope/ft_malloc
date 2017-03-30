@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/04 16:18:24 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/08 04:11:53 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 17:12:49 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 ** If nothing is found returns NULL
 ** If buf is NULL returns NULL.
 */
+
 t_table				*find_table_of_buffer(t_buffer *buf)
 {
 	t_table	*t;
@@ -39,6 +40,7 @@ t_table				*find_table_of_buffer(t_buffer *buf)
 ** Searchs for buffer at -buf- in mapping -m-.
 ** If not found returns NULL
 */
+
 static t_buffer		*find_buffer_in_mapping(void *buf_addr, t_mapping *m)
 {
 	t_buffer		*b;
@@ -59,6 +61,7 @@ static t_buffer		*find_buffer_in_mapping(void *buf_addr, t_mapping *m)
 /*
 ** Computes address of -buf- in -map- mapping.
 */
+
 void				*get_address_of_loc(t_alloc_loc_reduced loc)
 {
 	t_buffer	*b;
@@ -82,6 +85,7 @@ void				*get_address_of_loc(t_alloc_loc_reduced loc)
 ** filled with NULL pointers.
 ** Can be safely called if g_malloc_infos.tables is not set.
 */
+
 t_alloc_location	find_buffer_in_tables(void *buf_addr)
 {
 	t_alloc_location	loc;
@@ -115,6 +119,7 @@ t_alloc_location	find_buffer_in_tables(void *buf_addr)
 ** This parses all mappings in search of one having -buf- as its first buffer
 ** this is used only for defragmentation of buffers in tables
 */
+
 t_mapping			*find_mapping_of_first_buffer(t_buffer *buf)
 {
 	t_table		*t;

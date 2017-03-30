@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 17:12:41 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/29 16:53:08 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 17:17:13 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 ** A funciton to know if a table as enough room to store the type
 ** described by -type-
 */
+
 int			table_has_room_for(t_table *table, enum e_entry_type type)
 {
 	size_t	remaining_size;

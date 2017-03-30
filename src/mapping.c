@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/03 17:34:24 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/08 03:24:01 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 17:16:28 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 ** Creates a free buffer of the whole mapping len and saves it to the tables
 ** If saving to the tables fails, returns a location filled with NULL
 */
+
 static t_buf_location	create_initial_buffer(size_t len)
 {
 	t_buffer	buf;
@@ -37,6 +38,7 @@ static t_buf_location	create_initial_buffer(size_t len)
 ** Initialize the mapping with a single free buffer of the whole mapping length.
 ** On error nothing is mmaped and the function returns NULL
 */
+
 static t_map_location	create_mapping(size_t desired)
 {
 	t_mapping			mapping;
@@ -69,8 +71,9 @@ static t_map_location	create_mapping(size_t desired)
 ** and returns the most suitable free space for an allocation of -size-
 ** if non is suitable, returns NULL.
 */
+
 static t_buffer			*find_best_free_buffer_in_mapping(t_mapping *mapping,
-	   	size_t size)
+	size_t size)
 {
 	t_buffer	*p;
 	t_buffer	*best;
@@ -100,8 +103,9 @@ static t_buffer			*find_best_free_buffer_in_mapping(t_mapping *mapping,
 ** If true it updates -best- to -current-
 ** If -best_map- points to NULL, -current- is considered better.
 */
+
 static void				check_is_best(t_alloc_loc_reduced *best,
-	enum e_mapping_type type, t_mapping	*current_map, size_t alloc_size)
+	enum e_mapping_type type, t_mapping *current_map, size_t alloc_size)
 {
 	t_buffer			*current_best_buf;
 
@@ -129,6 +133,7 @@ static void				check_is_best(t_alloc_loc_reduced *best,
 ** When called g_malloc_infos.tables must already be set.
 ** The table pointers are not saved but saved to NULL
 */
+
 t_alloc_loc_reduced		find_best_mapping_for_size(size_t size)
 {
 	enum e_mapping_type	type;

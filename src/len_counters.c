@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/04 14:28:02 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/04 15:16:13 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 17:14:08 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 ** Recomputes the new table->shortest_free_buffer and table->longest.
 ** buf is a buffer pointer from which table is obtained
 */
+
 void	recompute_best_len(t_mapping *map)
 {
 	t_buffer		*p;

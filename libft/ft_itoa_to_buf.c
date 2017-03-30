@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/06 21:07:23 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/06 21:17:55 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 15:52:21 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static int	get_size(int n)
 	return (c + 1);
 }
 
-char	*ft_itoa_to_buf(int n, char *str, size_t max_len)
+char		*ft_itoa_to_buf(int n, char *str, size_t max_len)
 {
 	int		is_neg;
 	int		len;

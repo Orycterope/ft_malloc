@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/03 15:14:01 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/08 02:42:45 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 17:15:25 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 ** If mmap fails, returns NULL.
 ** When called g_malloc_infos.tables must already be set.
 */
+
 static t_table	*find_table_for_type(enum e_entry_type type)
 {
 	t_table			*table;
@@ -50,6 +51,7 @@ static t_table	*find_table_for_type(enum e_entry_type type)
 ** If the mmap failed, the return is filled with NULL
 ** When called g_malloc_infos.tables must already be set.
 */
+
 t_buf_location	save_buffer_to_tables(t_buffer buf)
 {
 	t_buf_location	loc;
@@ -73,6 +75,7 @@ t_buf_location	save_buffer_to_tables(t_buffer buf)
 ** If the mmap failed, the return is filled with NULL
 ** When called g_malloc_infos.tables must already be set.
 */
+
 t_map_location	save_mapping_to_tables(t_mapping map)
 {
 	t_map_location	loc;
@@ -94,6 +97,7 @@ t_map_location	save_mapping_to_tables(t_mapping map)
 ** and updates table->occupied_count.
 ** Attempts to free the table.
 */
+
 void			remove_mapping_from_tables(t_map_location loc)
 {
 	t_mapping	*first_mapping;
@@ -104,7 +108,6 @@ void			remove_mapping_from_tables(t_map_location loc)
 	if (loc.map != last_mapping)
 		*loc.map = *last_mapping;
 	loc.table->occupied_maps--;
-	ft_bzero(last_mapping, sizeof(struct s_mapping)); // debug, remove me
 	try_free_table(loc.table);
 }
 
@@ -115,6 +118,7 @@ void			remove_mapping_from_tables(t_map_location loc)
 ** Attempts to free the table.
 ** All the data in -loc- must be valid.
 */
+
 void			remove_buffer_from_tables(t_buf_location loc)
 {
 	t_buffer	*first_buffer;
@@ -134,6 +138,5 @@ void			remove_buffer_from_tables(t_buf_location loc)
 			find_mapping_of_first_buffer(last_buffer)->buffers = loc.buf;
 	}
 	loc.table->occupied_buffers--;
-	ft_bzero(last_buffer, sizeof(struct s_buffer)); // debug, remove me
 	try_free_table(loc.table);
 }

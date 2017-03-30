@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/29 12:45:45 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/29 13:11:37 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 17:18:57 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 ** Parses all mappings and returns if there are other mapping of the same type
 ** Used to allways keep at least one mapping of each type.
 */
+
 static int	is_only_mapping_of_type(enum e_mapping_type type, t_mapping *map)
 {
 	t_table		*t;
@@ -41,19 +42,19 @@ static int	is_only_mapping_of_type(enum e_mapping_type type, t_mapping *map)
 	return (1);
 }
 
-
 /*
 ** Decides if the mapping should be deleted, and if yes removes its
 ** first and only buffer from tables, and then deletes it.
 */
+
 void		try_delete_mapping(t_map_location m)
 {
+	t_buf_location	map_first_buf;
+
 	if (m.map->buffers->alloc_status == BUFFER_FREE
 			&& m.map->buffers->next_buf == NULL
 			&& !is_only_mapping_of_type(m.map->mapping_type, m.map))
 	{
-		t_buf_location	map_first_buf;
-
 		map_first_buf.buf = m.map->buffers;
 		map_first_buf.table = find_table_of_buffer(m.map->buffers);
 		remove_buffer_from_tables(map_first_buf);

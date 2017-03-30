@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 18:54:56 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/30 14:10:51 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/03/30 15:57:02 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int						create_allocation(t_alloc_loc_reduced alloc,
 		size_t desired_size);
 void					free_buffer_at(t_alloc_location loc,
 		int should_try_free_mapping);
-void					*resize_buffer(t_alloc_loc_reduced loc, size_t new_size);
+void					*resize_buffer(t_alloc_loc_reduced loc, size_t size);
 
 /*
 ** location_utils.c
