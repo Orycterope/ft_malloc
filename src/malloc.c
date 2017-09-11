@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/02 17:00:21 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/30 17:26:10 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/09/11 15:29:29 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,6 @@ void				*calloc(size_t count, size_t size)
 {
 	void	*ptr;
 
-	ft_putstr("Calloc was called\n");
 	size *= count;
 	ptr = malloc(size);
 	if (ptr)

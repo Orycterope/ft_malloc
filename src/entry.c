@@ -6,7 +6,7 @@
 /*   By: tvermeil <tvermeil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/03 15:14:01 by tvermeil          #+#    #+#             */
-/*   Updated: 2017/03/30 17:15:25 by tvermeil         ###   ########.fr       */
+/*   Updated: 2017/09/11 15:11:18 by tvermeil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ void			remove_buffer_from_tables(t_buf_location loc)
 		else
 			find_mapping_of_first_buffer(last_buffer)->buffers = loc.buf;
 	}
+	ft_bzero(last_buffer, sizeof(*last_buffer));
 	loc.table->occupied_buffers--;
 	try_free_table(loc.table);
 }
